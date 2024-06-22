@@ -118,46 +118,83 @@ public class InterfaceUsuario {
     }
 
     private void alterarLutador() {
-        System.out.print("Nome do Lutador a Alterar: ");
-        String nomeAntigo = scanner.nextLine();
+        List<Lutador> lutadores = gerenciadorLutadores.getLutadores();
 
-        Lutador lutadorAntigo = gerenciadorLutadores.getLutadores().stream()
-                .filter(l -> l.getNome().equalsIgnoreCase(nomeAntigo))
-                .findFirst()
-                .orElse(null);
-
-        if (lutadorAntigo != null) {
-            System.out.print("Novo Nome: ");
-            String nomeNovo = scanner.nextLine();
-
-            System.out.print("Nova Altura (em metros): ");
-            double novaAltura;
-            try {
-                novaAltura = scanner.nextDouble();
-            } catch (InputMismatchException e) {
-                System.out.println("Entrada inválida para altura. Digite um número decimal.");
-                scanner.next(); // Consumir entrada inválida
-                return;
-            }
-
-            System.out.print("Novo Peso (em kg): ");
-            double novoPeso;
-            try {
-                novoPeso = scanner.nextDouble();
-            } catch (InputMismatchException e) {
-                System.out.println("Entrada inválida para peso. Digite um número decimal.");
-                scanner.next(); // Consumir entrada inválida
-                return;
-            }
-
-            Lutador lutadorNovo = new Lutador(nomeNovo, novaAltura, novoPeso);
-            gerenciadorLutadores.alterarLutador(lutadorAntigo, lutadorNovo);
-            System.out.println("Lutador " + nomeAntigo + " alterado para " + nomeNovo + " com sucesso!");
-            scanner.nextLine(); // Consumir quebra de linha
-        } else {
-            System.out.println("Lutador não encontrado.");
+        if (lutadores.isEmpty()) {
+            System.out.println("Não há lutadores na lista.");
+            return; // Exit if no fighters exist
         }
+
+        // Display Fighter List
+        System.out.println("Lista de Lutadores:");
+        for (int i = 0; i < lutadores.size(); i++) {
+            Lutador lutador = lutadores.get(i);
+            System.out.println((i + 1) + ". " + lutador.getNome());
+        }
+
+        // Prompt for Selection
+        System.out.print("Número do Lutador a Alterar (ou 0 para cancelar): ");
+        int escolha;
+        try {
+            escolha = scanner.nextInt();
+        } catch (InputMismatchException e) {
+            System.out.println("Entrada inválida. Digite um número.");
+            scanner.next(); // Consume invalid input
+            return;
+        }
+
+        if (escolha == 0) {
+            System.out.println("Alteração cancelada.");
+            return; // Exit if user chooses to cancel
+        }
+
+        if (escolha < 1 || escolha > lutadores.size()) {
+            System.out.println("Número inválido. Digite um número entre 1 e " + lutadores.size() + ".");
+            return; // Exit if invalid choice
+        }
+
+        Lutador lutadorAntigo = lutadores.get(escolha - 1); // Get selected fighter
+
+        // Proceed with alteration process (rest of the code remains the same)
+        System.out.println("Lutador Atual:");
+        System.out.println("Nome: " + lutadorAntigo.getNome());
+        System.out.println("Altura: " + lutadorAntigo.getAltura() + " m");
+        System.out.println("Peso: " + lutadorAntigo.getPeso() + " kg");
+
+
+        // Gather New Information
+        System.out.print("Novo Nome: ");
+        String nomeNovo = scanner.nextLine();
+
+        System.out.print("Nova Altura (em metros): ");
+        double novaAltura;
+        try {
+            novaAltura = scanner.nextDouble();
+        } catch (InputMismatchException e) {
+            System.out.println("Entrada inválida para altura. Digite um número decimal.");
+            scanner.next(); // Consume invalid input
+            return;
+        }
+
+        System.out.print("Novo Peso (em kg): ");
+        double novoPeso;
+        try {
+            novoPeso = scanner.nextDouble();
+        } catch (InputMismatchException e) {
+            System.out.println("Entrada inválida para peso. Digite um número decimal.");
+            scanner.next(); // Consume invalid input
+            return;
+        }
+
+        Lutador lutadorNovo = new Lutador(nomeNovo, novaAltura, novoPeso);
+        gerenciadorLutadores.alterarLutador(lutadorAntigo, lutadorNovo);
+        System.out.println("Lutador " + lutadorAntigo.getNome() + " alterado para " + nomeNovo + " com sucesso!");
+        scanner.nextLine(); // Consume newline
     }
+
+
+
+
 
     private void mostrarLutadores() {
         List<Lutador> lutadores = gerenciadorLutadores.getLutadores();
