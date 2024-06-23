@@ -1,4 +1,4 @@
-# TrabalhoLutadores
+# Trabalho Lutadores
  
 ## Gerenciador de Lutadores
 
