@@ -1,10 +1,15 @@
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
-
 public class Menu {
-    public GerenciadorLutadores gerenciadorLutadores;
+
+    // Referência ao gerenciador de lutadores (para interagir com a lista de lutadores)
+    private GerenciadorLutadores gerenciadorLutadores;
+
+    // Referência à interface de usuário (para delegar tarefas de exibição e leitura de dados)
     private InterfaceUsuario interfaceUsuario;
+
+    // Scanner para leitura de entradas do usuário
     private Scanner scanner;
 
     public Menu(Scanner scanner) {
@@ -17,7 +22,7 @@ public class Menu {
         System.out.println("2. Remover Lutador");
         System.out.println("3. Alterar Lutador");
         System.out.println("4. Mostrar Lutadores");
-        System.out.println("5. Fechar Categorias");
+        System.out.println("5. Fechar Categorias"); // (A função dessa opção depende da implementação do GerenciadorLutadores)
         System.out.println("6. Sair");
         System.out.print("Digite sua opção: ");
     }
@@ -25,11 +30,11 @@ public class Menu {
     public int lerOpcao() {
         try {
             int opcao = scanner.nextInt();
-            return opcao; // Return the read option directly
+            return opcao;
         } catch (InputMismatchException e) {
             System.out.println("Entrada inválida. Digite um número inteiro.");
-            scanner.next(); // Consume invalid input
-            return 0; // Indicate invalid input (optional, adjust based on your logic)
+            scanner.next(); // Consome a entrada inválida
+            return 0; // Retorna 0 para indicar entrada inválida (opcional, ajuste de acordo com sua lógica)
         }
     }
 }
