@@ -3,67 +3,54 @@ import java.util.Scanner;
 import java.util.List;
 
 public class InterfaceUsuario {
+    public GerenciadorLutadores gerenciadorLutadores;
+    public Menu menu;
+    public Scanner scanner;
 
-    private GerenciadorLutadores gerenciadorLutadores;
-    private Scanner scanner;
-
-    public InterfaceUsuario(GerenciadorLutadores gerenciadorLutadores) {
+    public InterfaceUsuario(Scanner scanner, GerenciadorLutadores gerenciadorLutadores) {
+        this.scanner = scanner;
         this.gerenciadorLutadores = gerenciadorLutadores;
-        this.scanner = new Scanner(System.in);
     }
 
     public void executarMenu() {
-        while (true) {
-            exibirMenu();
-            int opcao = lerOpcao();
+        Menu menu = new Menu(scanner);
+        int opcao;
+        do {
+            menu.exibirMenu();
+            opcao = menu.lerOpcao();
+            rotearParaFuncao(opcao); // Call rotearParaFuncao directly
 
-            switch (opcao) {
-                case 1:
-                    adicionarLutador();
-                    break;
-                case 2:
-                    removerLutador();
-                    break;
-                case 3:
-                    alterarLutador();
-                    break;
-                case 4:
-                    mostrarLutadores();
-                    break;
-                case 5:
-                    gerenciadorLutadores.fecharCategorias();
-                    break;
-                case 6:
-                    System.out.println("Saindo do programa...");
-                    return;
-                default:
-                    System.out.println("Opção inválida!");
-            }
+            // Optional: Handle invalid input message or logic here (if lerOpcao doesn't return an error indicator)
+        } while (opcao != -1);
+    }
+
+    private void rotearParaFuncao(int opcao) {
+        switch (opcao) {
+            case 1:
+                adicionarLutador(gerenciadorLutadores);
+                break;
+            case 2:
+                removerLutador(gerenciadorLutadores);
+                break;
+            case 3:
+                alterarLutador(gerenciadorLutadores);
+                break;
+            case 4:
+                mostrarLutadores(gerenciadorLutadores);
+                break;
+            case 5:
+                gerenciadorLutadores.fecharCategorias();
+                break;
+            case 6:
+                System.out.println("Saindo do programa...");
+                break;
+            default:
+                System.out.println("Opção inválida! Tente novamente.");
         }
     }
 
-    private void exibirMenu() {
-        System.out.println("\n**MENU**");
-        System.out.println("1. Adicionar Lutador");
-        System.out.println("2. Remover Lutador");
-        System.out.println("3. Alterar Lutador");
-        System.out.println("4. Mostrar Lutadores");
-        System.out.println("5. Fechar Categorias");
-        System.out.println("6. Sair");
-        System.out.print("Digite sua opção: ");
-    }
 
-    private int lerOpcao() {
-        try {
-            return scanner.nextInt();
-        } catch (InputMismatchException e) {
-            System.out.println("Entrada inválida. Digite um número inteiro.");
-            scanner.next(); // Consumir entrada inválida
-            return 0;
-        }
-    }
-
-    private void adicionarLutador() {
+    public void adicionarLutador(GerenciadorLutadores gerenciadorLutadores) {
         System.out.print("Nome do Lutador: ");
         String nome = scanner.nextLine(); // Capture name
         try {
@@ -94,31 +81,58 @@ public class InterfaceUsuario {
         }
 
         Lutador lutador = new Lutador(nome, altura, peso);
-        gerenciadorLutadores.adicionarLutador(lutador);
+        this.gerenciadorLutadores.adicionarLutador(lutador);
         System.out.println("Lutador " + nome + " adicionado com sucesso!");
         scanner.nextLine(); // Consumir quebra de linha após entrada de peso
     }
 
 
-    private void removerLutador() {
-        System.out.print("Nome do Lutador a Remover: ");
-        String nome = scanner.nextLine();
+    public void removerLutador(GerenciadorLutadores gerenciadorLutadores) {
+        List<Lutador> lutadores = this.gerenciadorLutadores.getLutadores();
 
-        Lutador lutador = gerenciadorLutadores.getLutadores().stream()
-                .filter(l -> l.getNome().equalsIgnoreCase(nome))
-                .findFirst()
-                .orElse(null);
-
-        if (lutador != null) {
-            gerenciadorLutadores.removerLutador(lutador);
-            System.out.println("Lutador " + nome + " removido com sucesso!");
-        } else {
-            System.out.println("Lutador não encontrado.");
+        if (lutadores.isEmpty()) {
+            System.out.println("Não há lutadores na lista.");
+            return; // Exit if no fighters exist
         }
+
+        // Display Fighter List
+        System.out.println("Lista de Lutadores:");
+        for (int i = 0; i < lutadores.size(); i++) {
+            Lutador lutador = lutadores.get(i);
+            System.out.println((i + 1) + ". " + lutador.getNome());
+        }
+
+        // Prompt for Selection
+        System.out.print("Número do Lutador a Remover (ou 0 para cancelar): ");
+        int escolha;
+        try {
+            escolha = scanner.nextInt();
+        } catch (InputMismatchException e) {
+            System.out.println("Entrada inválida. Digite um número.");
+            scanner.next(); // Consume invalid input
+            return;
+        }
+
+        if (escolha == 0) {
+            System.out.println("Remoção cancelada.");
+            return; // Exit if user chooses to cancel
+        }
+
+        if (escolha < 1 || escolha > lutadores.size()) {
+            System.out.println("Número inválido. Digite um número entre 1 e " + lutadores.size() + ".");
+            return; // Exit if invalid choice
+        }
+
+        Lutador lutador = lutadores.get(escolha - 1); // Get selected fighter
+
+        this.gerenciadorLutadores.removerLutador(lutador);
+        System.out.println("Lutador " + lutador.getNome() + " removido com sucesso!");
+        scanner.nextLine(); // Consume newline
     }
 
-    private void alterarLutador() {
-        List<Lutador> lutadores = gerenciadorLutadores.getLutadores();
+
+    public void alterarLutador(GerenciadorLutadores gerenciadorLutadores) {
+        List<Lutador> lutadores = this.gerenciadorLutadores.getLutadores();
 
         if (lutadores.isEmpty()) {
             System.out.println("Não há lutadores na lista.");
@@ -165,7 +179,13 @@ public class InterfaceUsuario {
         // Gather New Information
         System.out.print("Novo Nome: ");
         String nomeNovo = scanner.nextLine();
-
+        try {
+            nomeNovo = scanner.nextLine();
+        } catch (InputMismatchException e) {
+            System.out.println("Entrada inválida para Nome. Digite um nome válido.");
+            scanner.next(); // Consumir entrada inválida
+            return;
+        }
         System.out.print("Nova Altura (em metros): ");
         double novaAltura;
         try {
@@ -187,7 +207,7 @@ public class InterfaceUsuario {
         }
 
         Lutador lutadorNovo = new Lutador(nomeNovo, novaAltura, novoPeso);
-        gerenciadorLutadores.alterarLutador(lutadorAntigo, lutadorNovo);
+        this.gerenciadorLutadores.alterarLutador(lutadorAntigo, lutadorNovo);
         System.out.println("Lutador " + lutadorAntigo.getNome() + " alterado para " + nomeNovo + " com sucesso!");
         scanner.nextLine(); // Consume newline
     }
@@ -196,8 +216,8 @@ public class InterfaceUsuario {
 
 
 
-    private void mostrarLutadores() {
-        List<Lutador> lutadores = gerenciadorLutadores.getLutadores();
+    public void mostrarLutadores(GerenciadorLutadores gerenciadorLutadores) {
+        List<Lutador> lutadores = this.gerenciadorLutadores.getLutadores();
 
         if (lutadores.isEmpty()) {
             System.out.println("Não há lutadores cadastrados.");

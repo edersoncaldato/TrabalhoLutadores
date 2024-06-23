@@ -3,13 +3,18 @@ import java.util.Scanner;
 public class Main {
 
     public static void main(String[] args) {
-        // Cria um gerenciador de lutadores
+        // Create a scanner object for user input
+        Scanner scanner = new Scanner(System.in);
+
+        // Create a GerenciadorLutadores object to manage fighters
         GerenciadorLutadores gerenciadorLutadores = new GerenciadorLutadores();
+        Menu menu = new Menu(scanner); // Pass Scanner object
+        InterfaceUsuario interfaceUsuario = new InterfaceUsuario(scanner, gerenciadorLutadores);
 
-        // Cria uma interface de usuário
-        InterfaceUsuario interfaceUsuario = new InterfaceUsuario(gerenciadorLutadores);
-
-        // Executa o menu principal
+        // Execute the main menu
         interfaceUsuario.executarMenu();
+
+        // Close the scanner object
+        scanner.close();
     }
 }
